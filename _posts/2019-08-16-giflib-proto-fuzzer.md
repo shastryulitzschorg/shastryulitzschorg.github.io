@@ -24,8 +24,8 @@ Earlier this year, You et. al. [3], presented a “seedless fuzzer” that uses 
 
 Finally, giflib’s bug tracker itself tracks bugs and vulnerabilities found during its lifetime. The tracker contains about 35 bugs that can be considered security vulnerabilities (crash, information leakage etc.) over its lifetime of a little over 30 years (v1.0 dated 14 June 1989 [4]). That’s roughly one vulnerability every year, not bad eh?
 
-The histograms below shows in whichs components those vulnerabilities were found and when. Despite the utilities being the most promising target in number of vulnerabilities found, 
-we decider to focus on the decoder, since it's the most impactful component. 
+The histograms below shows in which components those vulnerabilities were found and when. Despite the utilities being the most promising target in number of vulnerabilities found, 
+we decided to focus on the decoder, since it's the most impactful component. 
 <!-- | Giflib component      | Number of vulnerabilities           |
 | ------------- |:-------------:|
 | Utilities | 25 |
@@ -57,9 +57,8 @@ KCC gives a good example of this in [8]:
 ![Kcc giflib protobuf example](/assets/img/giflib_kcc_protobuf_example.jpg)
 
 To add protobuf fuzzing to our giflib harness, we had to do two things:
-Define a protobuf specification for gif files. You can find our current specification here, which is based on [9] and [10] [here](https://github.com/google/oss-fuzz/blob/master/projects/giflib/gif_fuzz_proto.proto)
-Define a function that converts a giflib protobuf object to a gif file stream. This is relatively straight forward. Our converter is based on a class that recursively calls a function visit, each time with the right data format. You can take a look here: 
-https://github.com/google/oss-fuzz/blob/master/projects/giflib/ProtoToGif.cpp
+Define a protobuf specification for gif files. You can find our current specification [here](https://github.com/google/oss-fuzz/blob/master/projects/giflib/gif_fuzz_proto.proto), which is based on [9] and [10].
+Define a function that converts a giflib protobuf object to a gif file stream. This is relatively straight forward. Our converter is based on a class that recursively calls a function visit, each time with the right data format. You can take a look [here](https://github.com/google/oss-fuzz/blob/master/projects/giflib/ProtoToGif.cpp).
 Each visit function adds raw data to the string stream that is then returned as the raw gif data. 
 Our harness then takes the protobuf specification, converts it to gif file stream and passes it to our original gif fuzzing harness:
 ```
@@ -90,7 +89,14 @@ Unfortunately, the protobuf fuzzer did not outperform our simple fuzzing harness
 
 In the future, we want to tackle this problem by adding a perturbation mechanism to our fuzzing harness, that occasionally allows for a mutation that does not necessarily lead to a valid gif. For example, we could add an optional fuzz-data field to our protobuf specification that, if included, just consists of random bytes (something like optional bytes fuzz_data). 
 
-What was still impressive to us is that, aside from error-handling code, our protobuf fuzzing setup reached exactly the same amount of coverage as the standard fuzzing setup, however without requiring any seeds.
+What was still impressive to us is that, aside from error-handling code, our protobuf fuzzing setup reached exactly the same amount of coverage as the standard fuzzing setup, however without requiring any seeds. 
+
+The table below compares the two fuzzing harnesses in terms of line coverage.
+
+| Fuzzer type      | Percentage (SLoC covered/Total SLoC) |
+| ------------- |:-------------:|
+| Structure Aware |  58.03% (900/1551) |
+| Non Structure Aware | 58.99% (915/1551)  |
 
 
 ## Conclusion
