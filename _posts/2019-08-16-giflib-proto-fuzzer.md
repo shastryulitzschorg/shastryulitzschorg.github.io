@@ -6,7 +6,8 @@ title: Making Memes Secure Again
 
 ## TL;DR
 
-We fuzzed giflib and found two bugs, one of which could be used for a remote DoS.
+We fuzzed giflib and found two bugs, one of which could be used for a remote DoS
+and has been assigned [CVE 2019-15133](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-15133).
 We tried to enhance our setup with structure-aware fuzzing, but this did not outperform
 standard coverage fuzzing.
 
@@ -83,7 +84,7 @@ DEFINE_PROTO_FUZZER(const GifProto &gif_proto)
 After submitting our fuzzing-harness to oss-fuzz, it discovered multiple bugs in giflib which were since fixed. Here is a list of bugs discovered by our fuzzing harness: 
 
 * [Integer overflow in dgif_slup](https://oss-fuzz.com/testcase-detail/5636672685867008)
-* [Divide-by-zero in DGifSlurp](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=13009)
+* [Divide-by-zero in DGifSlurp](https://bugs.chromium.org/p/oss-fuzz/issues/detail?id=13009), [CVE-2019-15133](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-15133)
 
 Unfortunately, the protobuf fuzzer did not outperform our simple fuzzing harness by any metric. It did not find new bugs in giflib and did not lead to increased coverage in comparison to a fuzzing harness that relied on seeds and libfuzzer’s build on mutations. In fact, it even resulted in less coverage: Since every gif file synthesized by the protobuf fuzzing harness is a valid gif file, our protobuf fuzzing harness now misses some of the error-handling code that our standard fuzzing setup covers. 
 
